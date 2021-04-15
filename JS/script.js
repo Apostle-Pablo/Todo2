@@ -67,3 +67,33 @@ deleteAllBtn.onclick = ()=>{
   localStorage.setItem("New Todo", JSON.stringify(listArray)); //set the item in localstorage
   showTasks(); //call the showTasks function
 }
+
+let today = new Date();
+let dd = today.getDate();
+let mm = today.getMonth() + 1 ;
+let yyyy = today.getFullYear();
+if (dd < 10) {
+  dd = '0' + dd
+}
+if (mm < 10) {
+  mm = '0' + mm
+}
+today = dd + '/' + mm + '/' + yyyy;
+document.getElementById('data').innerHTML=today;
+
+
+db = openDatabase("ToDo", "1.0", "A list of to do items.", 5*1024*1024)
+if(!db){alert("Failed to connect to database.")}
+console.log(db)
+
+db.transaction(function(tx) {
+  tx.executeSql("SELECT COUNT(*) FROM ToDo", [], function (result) { alert('ALARM') }, function (tx, error) {
+  tx.executeSql("CREATE TABLE ToDo (id REAL UNIQUE, label TEXT, timestamp REAL)", [], null, null);
+  })});
+
+  db.transaction(function(tx) {
+    tx.executeSql("INSERT INTO ToDo (label, timestamp) values("Купить iPad или HP Slate", new Date().getTime())",// ["Купить iPad или HP Slate", new Date().getTime()], null, null);
+    });
+
+
+
