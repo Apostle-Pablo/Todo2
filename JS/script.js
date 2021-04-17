@@ -90,10 +90,3 @@ db.transaction(function(tx) {
   tx.executeSql("SELECT COUNT(*) FROM ToDo", [], function (result) { alert('ALARM') }, function (tx, error) {
   tx.executeSql("CREATE TABLE ToDo (id REAL UNIQUE, label TEXT, timestamp REAL)", [], null, null);
   })});
-
-  db.transaction(function(tx) {
-    tx.executeSql("INSERT INTO ToDo (label, timestamp) values("Купить iPad или HP Slate", new Date().getTime())",// ["Купить iPad или HP Slate", new Date().getTime()], null, null);
-    });
-
-
-
