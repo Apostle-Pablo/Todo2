@@ -3,13 +3,15 @@ const inputBox = document.querySelector(".inputField input");
 const addBtn = document.querySelector(".inputField button");
 const todoList = document.querySelector(".todoList");
 const deleteAllBtn = document.querySelector(".footer button");
+// const deleteTask = document.querySelector(".newLiTag button")
 
 /////////////////////////////////////////Data base block///////////////////////////////////////
 const initDB = () => { ///Init db
   const db = openDatabase("ToDo", "1.0", "A list of to do items.", 5*1024*1024);
   if(!db){alert("Failed to connect to database.")}
   db.transaction((tx) => {
-    tx.executeSql('CREATE TABLE IF NOT EXISTS todo(id integer primary key autoincrement, value)');
+    tx.executeSql('CREATE TABLE IF NOT EXISTS todo(id integer primary key autoincrement, value, date DEFAULT CURRENT_TIMESTAMP)'); 
+    // DEFAULT CURRENT_TIMESTAMP - добавление текущего времени системы в таблицу.
   })
   return db
 }
@@ -48,14 +50,13 @@ inputBox.onkeyup = ()=>{
   }
 }
 
-showTasks(); //calling showTask function
+showTasks(); //calling showTask function 
 
 addBtn.onclick = async ()=>{ //when user click on plus icon button
   const value = inputBox.value; //getting input field value
   await setTask(value);
   showTasks();
 }
-
 
 
 async function showTasks() {
@@ -69,27 +70,40 @@ async function showTasks() {
 
   let newLiTag = "";
   tasks.forEach((task, index) => {
-    newLiTag += `<li>${task.value}<span class="icon" onclick="deleteTask(${index})"><i class="fas fa-trash"></i></span></li>`;
+    newLiTag += `
+    <li>${task.value}
+      <span class="icon" onclick="deleteTask(${index})">
+         <i class="fas fa-trash"></i>
+      </span>
+    </li>
+   
+    `;
   });
   todoList.innerHTML = newLiTag; //adding new li tag inside ul tag
   inputBox.value = ""; //once task added leave the input field blank
 }
 
+
+// Edit
+
+
 // delete task function
 function deleteTask(index){
-  let getLocalStorageData = localStorage.getItem("New Todo");
-  listArray = JSON.parse(getLocalStorageData);
-  listArray.splice(index, 1); //delete or remove the li
-  localStorage.setItem("New Todo", JSON.stringify(listArray));
+  // let getLocalStorageData = localStorage.getItem("New Todo");
+  // listArray = JSON.parse(getLocalStorageData);
+  // listArray.splice(index, 1); //delete or remove the li
+  // localStorage.setItem("New Todo", JSON.stringify(listArray));
   showTasks(); //call the showTasks function
 }
 
 // delete all tasks function
 deleteAllBtn.onclick = ()=>{
-  listArray = []; //empty the array
-  localStorage.setItem("New Todo", JSON.stringify(listArray)); //set the item in localstorage
+  dbInstance.transaction((tx) => {
+    tx.executeSql('DROP TABLE `todo`')
+  })
   showTasks(); //call the showTasks function
 }
+
 
 let today = new Date();
 let dd = today.getDate();
