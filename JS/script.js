@@ -3,6 +3,42 @@ const inputBox = document.querySelector(".inputField input");
 const addBtn = document.querySelector(".inputField button");
 const todoList = document.querySelector(".todoList");
 const deleteAllBtn = document.querySelector(".footer button");
+// const deleteTask = document.querySelector(".newLiTag button")
+
+/////////////////////////////////////////Data base block///////////////////////////////////////
+const initDB = () => { ///Init db
+  const db = openDatabase("ToDo", "1.0", "A list of to do items.", 5*1024*1024);
+  if(!db){alert("Failed to connect to database.")}
+  db.transaction((tx) => {
+    tx.executeSql('CREATE TABLE IF NOT EXISTS todo(id integer primary key autoincrement, value, date DEFAULT CURRENT_TIMESTAMP)'); 
+    // DEFAULT CURRENT_TIMESTAMP - добавление текущего времени системы в таблицу.
+  })
+  return db
+}
+
+const dbInstance = initDB(); //get instance db
+
+function getTasks() { //propmise function get tasks
+  return new Promise((resolve) => {
+    dbInstance.transaction((tx) => {
+      tx.executeSql("SELECT * FROM todo", [], (tx, result) => {
+          const tasks = [];
+          for(task of result.rows) tasks.push(task)
+          return resolve(tasks)
+      })
+    })
+  })
+}
+
+function setTask(value) { //promise function set task
+  return new Promise((resolve, reject) => {
+    dbInstance.transaction((tx) => {
+      tx.executeSql("INSERT INTO todo(value) VALUES(?)", [value], () => resolve())
+    })
+  })
+}
+////////////////////////////////////////////////////////////////////////////
+
 
 // onkeyup event
 inputBox.onkeyup = ()=>{
@@ -14,59 +50,60 @@ inputBox.onkeyup = ()=>{
   }
 }
 
-showTasks(); //calling showTask function
+showTasks(); //calling showTask function 
 
-addBtn.onclick = ()=>{ //when user click on plus icon button
-  let userEnteredValue = inputBox.value; //getting input field value
-  let getLocalStorageData = localStorage.getItem("New Todo"); //getting localstorage
-  if(getLocalStorageData == null){ //if localstorage has no data
-    listArray = []; //create a blank array
-  }else{
-    listArray = JSON.parse(getLocalStorageData);  //transforming json string into a js object
-  }
-  listArray.push(userEnteredValue); //pushing or adding new value in array
-  localStorage.setItem("New Todo", JSON.stringify(listArray)); //transforming js object into a json string
-  showTasks(); //calling showTask function
-  addBtn.classList.remove("active"); //unactive the add button once the task added
+addBtn.onclick = async ()=>{ //when user click on plus icon button
+  const value = inputBox.value; //getting input field value
+  await setTask(value);
+  showTasks();
 }
 
-function showTasks(){
-  let getLocalStorageData = localStorage.getItem("New Todo");
-  if(getLocalStorageData == null){
-    listArray = [];
-  }else{
-    listArray = JSON.parse(getLocalStorageData); 
-  }
-  const pendingTasksNumb = document.querySelector(".pendingTasks");
-  pendingTasksNumb.textContent = listArray.length; //passing the array length in pendingtask
-  if(listArray.length > 0){ //if array length is greater than 0
+
+async function showTasks() {
+  const tasks = await getTasks();
+  if(!tasks.length) { //if array length is greater than 0
     deleteAllBtn.classList.add("active"); //active the delete button
-  }else{
+  }
+  else {
     deleteAllBtn.classList.remove("active"); //unactive the delete button
   }
+
   let newLiTag = "";
-  listArray.forEach((element, index) => {
-    newLiTag += `<li>${element}<span class="icon" onclick="deleteTask(${index})"><i class="fas fa-trash"></i></span></li>`;
+  tasks.forEach((task, index) => {
+    newLiTag += `
+    <li>${task.value}
+      <span class="icon" onclick="deleteTask(${index})">
+         <i class="fas fa-trash"></i>
+      </span>
+    </li>
+   
+    `;
   });
   todoList.innerHTML = newLiTag; //adding new li tag inside ul tag
   inputBox.value = ""; //once task added leave the input field blank
 }
 
+
+// Edit
+
+
 // delete task function
 function deleteTask(index){
-  let getLocalStorageData = localStorage.getItem("New Todo");
-  listArray = JSON.parse(getLocalStorageData);
-  listArray.splice(index, 1); //delete or remove the li
-  localStorage.setItem("New Todo", JSON.stringify(listArray));
+  // let getLocalStorageData = localStorage.getItem("New Todo");
+  // listArray = JSON.parse(getLocalStorageData);
+  // listArray.splice(index, 1); //delete or remove the li
+  // localStorage.setItem("New Todo", JSON.stringify(listArray));
   showTasks(); //call the showTasks function
 }
 
 // delete all tasks function
 deleteAllBtn.onclick = ()=>{
-  listArray = []; //empty the array
-  localStorage.setItem("New Todo", JSON.stringify(listArray)); //set the item in localstorage
+  dbInstance.transaction((tx) => {
+    tx.executeSql('DROP TABLE `todo`')
+  })
   showTasks(); //call the showTasks function
 }
+
 
 let today = new Date();
 let dd = today.getDate();
@@ -80,13 +117,3 @@ if (mm < 10) {
 }
 today = dd + '/' + mm + '/' + yyyy;
 document.getElementById('data').innerHTML=today;
-
-
-db = openDatabase("ToDo", "1.0", "A list of to do items.", 5*1024*1024)
-if(!db){alert("Failed to connect to database.")}
-console.log(db)
-
-db.transaction(function(tx) {
-  tx.executeSql("SELECT COUNT(*) FROM ToDo", [], function (result) { alert('ALARM') }, function (tx, error) {
-  tx.executeSql("CREATE TABLE ToDo (id REAL UNIQUE, label TEXT, timestamp REAL)", [], null, null);
-  })});
