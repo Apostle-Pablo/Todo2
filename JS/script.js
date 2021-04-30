@@ -62,20 +62,35 @@ addBtn.onclick = async ()=>{ //when user click on plus icon button
 async function showTasks() {
   const tasks = await getTasks();
   if(!tasks.length) { //if array length is greater than 0
+<<<<<<< HEAD
     deleteAllBtn.classList.remove("active"); //active the delete button
   }
   else {
     deleteAllBtn.classList.add("active"); //unactive the delete button
+=======
+    deleteAllBtn.classList.add("active"); //active the delete button
+  }
+  else {
+    deleteAllBtn.classList.remove("active"); //unactive the delete button
+>>>>>>> 12fcaca8276e853692ff7bc635c9d53f9e8fd3a6
   }
 
   let newLiTag = "";
   tasks.forEach((task, index) => {
     newLiTag += `
     <li>${task.value}
+<<<<<<< HEAD
     <span class="icon" onclick="deleteTask(${index})">
     <i class="fas fa-trash">delete</i>
     </span>
     </li>
+=======
+      <span class="icon" onclick="deleteTask(${index})">
+         <i class="fas fa-trash"></i>
+      </span>
+    </li>
+   
+>>>>>>> 12fcaca8276e853692ff7bc635c9d53f9e8fd3a6
     `;
   });
   todoList.innerHTML = newLiTag; //adding new li tag inside ul tag
@@ -87,6 +102,7 @@ async function showTasks() {
 
 
 // delete task function
+<<<<<<< HEAD
 -
 function deleteTask(index) {
   return new Promise((resolve) => {
@@ -96,6 +112,14 @@ function deleteTask(index) {
       tx.executeSql('DELETE FROM todo(id), id =" ??? " ');
     })
   })
+=======
+function deleteTask(index){
+  // let getLocalStorageData = localStorage.getItem("New Todo");
+  // listArray = JSON.parse(getLocalStorageData);
+  // listArray.splice(index, 1); //delete or remove the li
+  // localStorage.setItem("New Todo", JSON.stringify(listArray));
+  showTasks(); //call the showTasks function
+>>>>>>> 12fcaca8276e853692ff7bc635c9d53f9e8fd3a6
 }
 
 // function deleteTask(index){
