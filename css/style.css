@@ -128,17 +128,17 @@ body{
   pointer-events: auto;
 }
 .icon{
-  width: 50px;
+  width: 500px;
   height: 100%;
   border: none;
   color: #fff;
   margin-left: 5px;
-  font-size: 21px;
+  font-size: 15px;
   outline: none;
   background: #8E49E8;
   cursor: pointer;
   border-radius: 3px;
   opacity: 0.6;
   pointer-events: none;
-  transition: all 0.3s ease;
+ 
 }

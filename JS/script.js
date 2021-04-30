@@ -62,21 +62,20 @@ addBtn.onclick = async ()=>{ //when user click on plus icon button
 async function showTasks() {
   const tasks = await getTasks();
   if(!tasks.length) { //if array length is greater than 0
-    deleteAllBtn.classList.add("active"); //active the delete button
+    deleteAllBtn.classList.remove("active"); //active the delete button
   }
   else {
-    deleteAllBtn.classList.remove("active"); //unactive the delete button
+    deleteAllBtn.classList.add("active"); //unactive the delete button
   }
 
   let newLiTag = "";
   tasks.forEach((task, index) => {
     newLiTag += `
     <li>${task.value}
-      <span class="icon" onclick="deleteTask(${index})">
-         <i class="fas fa-trash"></i>
-      </span>
+    <span class="icon" onclick="deleteTask(${index})">
+    <i class="fas fa-trash">delete</i>
+    </span>
     </li>
-   
     `;
   });
   todoList.innerHTML = newLiTag; //adding new li tag inside ul tag
@@ -88,13 +87,24 @@ async function showTasks() {
 
 
 // delete task function
-function deleteTask(index){
-  // let getLocalStorageData = localStorage.getItem("New Todo");
-  // listArray = JSON.parse(getLocalStorageData);
-  // listArray.splice(index, 1); //delete or remove the li
-  // localStorage.setItem("New Todo", JSON.stringify(listArray));
-  showTasks(); //call the showTasks function
+-
+function deleteTask(index) {
+  return new Promise((resolve) => {
+    let id = document.getElementById("${index}");
+    console.log (id ) ;
+    dbInstance.transaction((tx) => {
+      tx.executeSql('DELETE FROM todo(id), id =" ??? " ');
+    })
+  })
 }
+
+// function deleteTask(index){
+//   let getLocalStorageData = localStorage.getItem("New Todo");
+//   listArray = JSON.parse(getLocalStorageData);
+//   listArray.splice(index, 1); //delete or remove the li
+//   localStorage.setItem("New Todo", JSON.stringify(listArray));
+//   showTasks(); //call the showTasks function
+// }
 
 // delete all tasks function
 deleteAllBtn.onclick = ()=>{
