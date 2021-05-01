@@ -61,39 +61,39 @@ addBtn.onclick = async ()=>{ //when user click on plus icon button
 
 async function showTasks() {
   const tasks = await getTasks();
+  console.log("call")
   if(!tasks.length) { //if array length is greater than 0
-<<<<<<< HEAD
     deleteAllBtn.classList.remove("active"); //active the delete button
   }
   else {
     deleteAllBtn.classList.add("active"); //unactive the delete button
-=======
-    deleteAllBtn.classList.add("active"); //active the delete button
-  }
-  else {
-    deleteAllBtn.classList.remove("active"); //unactive the delete button
->>>>>>> 12fcaca8276e853692ff7bc635c9d53f9e8fd3a6
   }
 
   let newLiTag = "";
   tasks.forEach((task, index) => {
-    newLiTag += `
-    <li>${task.value}
-<<<<<<< HEAD
-    <span class="icon" onclick="deleteTask(${index})">
-    <i class="fas fa-trash">delete</i>
-    </span>
-    </li>
-=======
-      <span class="icon" onclick="deleteTask(${index})">
-         <i class="fas fa-trash"></i>
-      </span>
-    </li>
-   
->>>>>>> 12fcaca8276e853692ff7bc635c9d53f9e8fd3a6
-    `;
+    const li = document.createElement("li");
+    const icon  = document.createElement("span");
+    const deleteButton =  document.createElement("i");
+    deleteButton.innerHTML="delete";
+    deleteButton.classList.add("fa")
+    deleteButton.addEventListener("click", ()=> {
+      deleteTask(index) 
+      showTasks();
+    }) 
+
+    icon.append(deleteButton);
+    li.append(icon);
+    todoList.append(li) ;
+
+    // newLiTag += `
+    // <li data-id="${index}">${task.value}
+    // <span class="icon" >
+    // <i class="fas fa-trash">delete</i>
+    // </span>
+    // </li>
+    // `;
   });
-  todoList.innerHTML = newLiTag; //adding new li tag inside ul tag
+   //adding new li tag inside ul tag
   inputBox.value = ""; //once task added leave the input field blank
 }
 
@@ -102,24 +102,14 @@ async function showTasks() {
 
 
 // delete task function
-<<<<<<< HEAD
--
+
 function deleteTask(index) {
-  return new Promise((resolve) => {
-    let id = document.getElementById("${index}");
-    console.log (id ) ;
+  console.log (index);
+  return new Promise((resolve) => {    
     dbInstance.transaction((tx) => {
-      tx.executeSql('DELETE FROM todo(id), id =" ??? " ');
+      tx.executeSql(`DELETE FROM todo where id=${index} `);
     })
   })
-=======
-function deleteTask(index){
-  // let getLocalStorageData = localStorage.getItem("New Todo");
-  // listArray = JSON.parse(getLocalStorageData);
-  // listArray.splice(index, 1); //delete or remove the li
-  // localStorage.setItem("New Todo", JSON.stringify(listArray));
-  showTasks(); //call the showTasks function
->>>>>>> 12fcaca8276e853692ff7bc635c9d53f9e8fd3a6
 }
 
 // function deleteTask(index){
@@ -134,8 +124,9 @@ function deleteTask(index){
 deleteAllBtn.onclick = ()=>{
   dbInstance.transaction((tx) => {
     tx.executeSql('DROP TABLE `todo`')
+    showTasks(); //call the showTasks function
   })
-  showTasks(); //call the showTasks function
+ 
 }
 
 
