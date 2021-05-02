@@ -16,7 +16,7 @@ const initDB = () => { ///Init db
   return db
 }
 
-const dbInstance = initDB(); //get instance db
+let dbInstance = initDB(); //get instance db
 
 function getTasks() { //propmise function get tasks
   return new Promise((resolve) => {
@@ -61,7 +61,9 @@ addBtn.onclick = async ()=>{ //when user click on plus icon button
 
 async function showTasks() {
   const tasks = await getTasks();
-  console.log("call")
+  console.log(tasks)
+  console.log("Call show all tasks")
+  todoList.innerHTML = "";
   if(!tasks.length) { //if array length is greater than 0
     deleteAllBtn.classList.remove("active"); //active the delete button
   }
@@ -69,31 +71,22 @@ async function showTasks() {
     deleteAllBtn.classList.add("active"); //unactive the delete button
   }
 
-  let newLiTag = "";
   tasks.forEach((task, index) => {
     const li = document.createElement("li");
+    const value = document.createElement("div");
+    value.innerHTML = task.value
+    li.append(value)
     const icon  = document.createElement("span");
-    const deleteButton =  document.createElement("i");
-    deleteButton.innerHTML="delete";
-    deleteButton.classList.add("fa")
-    deleteButton.addEventListener("click", ()=> {
-      deleteTask(index) 
+    icon.className = "icon"
+    icon.innerHTML = "delete";
+    icon.addEventListener("click", async () => {
+      await deleteTask(task.id);
       showTasks();
-    }) 
-
-    icon.append(deleteButton);
+    })
     li.append(icon);
-    todoList.append(li) ;
-
-    // newLiTag += `
-    // <li data-id="${index}">${task.value}
-    // <span class="icon" >
-    // <i class="fas fa-trash">delete</i>
-    // </span>
-    // </li>
-    // `;
+    todoList.append(li);
   });
-   //adding new li tag inside ul tag
+
   inputBox.value = ""; //once task added leave the input field blank
 }
 
@@ -104,41 +97,35 @@ async function showTasks() {
 // delete task function
 
 function deleteTask(index) {
-  console.log (index);
   return new Promise((resolve) => {    
     dbInstance.transaction((tx) => {
-      tx.executeSql(`DELETE FROM todo where id=${index} `);
+      tx.executeSql(`DELETE FROM todo where id=${index}`, [], () => resolve());
     })
   })
 }
 
-// function deleteTask(index){
-//   let getLocalStorageData = localStorage.getItem("New Todo");
-//   listArray = JSON.parse(getLocalStorageData);
-//   listArray.splice(index, 1); //delete or remove the li
-//   localStorage.setItem("New Todo", JSON.stringify(listArray));
-//   showTasks(); //call the showTasks function
-// }
-
-// delete all tasks function
-deleteAllBtn.onclick = ()=>{
+// delete all tasks functions
+deleteAllBtn.onclick = async () =>{
   dbInstance.transaction((tx) => {
-    tx.executeSql('DROP TABLE `todo`')
-    showTasks(); //call the showTasks function
+    tx.executeSql("DROP TABLE todo", null, () => {
+      dbInstance = initDB();
+      showTasks()
+    }) 
   })
- 
 }
 
+const dateFormat = () => {
+  let today = new Date();
+  let dd = today.getDate();
+  let mm = today.getMonth() + 1 ;
+  let yyyy = today.getFullYear();
+  if (dd < 10) {
+    dd = '0' + dd
+  }
+  if (mm < 10) {
+    mm = '0' + mm
+  }
+  return  dd + '/' + mm + '/' + yyyy;
+}
 
-let today = new Date();
-let dd = today.getDate();
-let mm = today.getMonth() + 1 ;
-let yyyy = today.getFullYear();
-if (dd < 10) {
-  dd = '0' + dd
-}
-if (mm < 10) {
-  mm = '0' + mm
-}
-today = dd + '/' + mm + '/' + yyyy;
-document.getElementById('data').innerHTML=today;
+document.getElementById('data').innerHTML = dateFormat();

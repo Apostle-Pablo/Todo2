@@ -86,8 +86,9 @@ body{
   cursor: default;
   overflow: hidden;
 }
-.todoList li .icon{
+.todoList li .icon {
   position: absolute;
+  top: 0px;
   right: -45px;
   background: #e74c3c;
   width: 45px;
@@ -97,7 +98,11 @@ body{
   cursor: pointer;
   transition: all 0.2s ease;
 }
-.todoList li:hover .icon{
+.todoList li:hover .icon {
+  right: 0px;
+}
+
+.todoList li:hover .icon {
   right: 0px;
 }
 .wrapper .footer{
@@ -127,7 +132,7 @@ body{
   opacity: 1;
   pointer-events: auto;
 }
-.icon{
+.icon {
   width: 500px;
   height: 100%;
   border: none;
@@ -139,6 +144,4 @@ body{
   cursor: pointer;
   border-radius: 3px;
   opacity: 0.6;
-  pointer-events: none;
- 
 }
